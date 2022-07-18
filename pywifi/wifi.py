@@ -11,14 +11,15 @@ entry point to manipulate wifi devices.
 
 import platform
 import logging
+from typing import List
 
-from .iface import Interface
+from pywifi.iface import Interface
 
 
 if platform.system().lower() == 'windows':
-    from . import _wifiutil_win as wifiutil
+    import pywifi._wifiutil_win as wifiutil
 elif platform.system().lower() == 'linux':
-    from . import _wifiutil_linux as wifiutil
+    import pywifi._wifiutil_linux as wifiutil
 else:
     raise NotImplementedError
 
@@ -33,7 +34,7 @@ class PyWiFi:
         
         self._logger = logging.getLogger('pywifi')
 
-    def interfaces(self):
+    def interfaces(self) -> List[Interface]:
         """Collect the available wlan interfaces."""
 
         self._ifaces = []

@@ -7,9 +7,10 @@ import logging
 import socket
 import stat
 import os
+from typing import List
 
-from .const import *
-from .profile import Profile
+from pywifi.const import *
+from pywifi.profile import Profile
 
 CTRL_IFACE_DIR = '/var/run/wpa_supplicant'
 CTRL_IFACE_RETRY = 3
@@ -66,7 +67,7 @@ class WifiUtil():
     def scan_results(self, obj):
         """Get the AP list after scanning."""
 
-        bsses = []
+        bsses: List[Profile] = []
         bsses_summary = self._send_cmd_to_wpas(obj['name'], 'SCAN_RESULTS', True)
         bsses_summary = bsses_summary[:-1].split('\n')
         if len(bsses_summary) == 1:
@@ -104,7 +105,7 @@ class WifiUtil():
             True)
         network_summary = network_summary[:-1].split('\n')
         if len(network_summary) == 1:
-            return networks
+            return network
 
         for l in network_summary[1:]:
             values = l.split('\t')
@@ -243,7 +244,7 @@ class WifiUtil():
 
         return networks
 
-    def remove_network_profile(self, obj, params):
+    def remove_network_profile(self, obj, params: Profile):
         """Remove the specified AP profiles"""
 
         network_id = -1
@@ -308,7 +309,7 @@ class WifiUtil():
         while retry >= 0:
             reply = sock.recv(REPLY_SIZE)
             if reply == b'':
-                self._logger.error("Connection to '%s' is broken!", iface_ctrl)
+                self._logger.error("Connection to '%s' is broken!", ctrl_iface)
                 break
 
             if reply.startswith(b'PONG'):

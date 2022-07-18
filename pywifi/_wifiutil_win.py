@@ -9,10 +9,11 @@ import time
 import logging
 from ctypes import *
 from ctypes.wintypes import *
+from typing import Dict, List
 from comtypes import GUID
 
-from .const import *
-from .profile import Profile
+from pywifi.const import *
+from pywifi.profile import Profile
 
 
 if platform.release().lower() == 'xp':
@@ -267,7 +268,7 @@ class WifiUtil():
         self._logger.debug("Scan found %d networks.",
             avail_network_list.contents.dwNumberOfItems)
 
-        network_list = []
+        network_list: List[Profile] = []
         for i in range(avail_network_list.contents.dwNumberOfItems):
 
             if networks[i].dot11BssType == 1 and networks[i].bNetworkConnectable :
@@ -295,10 +296,8 @@ class WifiUtil():
                     network = Profile()
 
                     network.ssid = ssid
-
-                    network.bssid = ''
-                    for k in range(6):
-                        network.bssid += "%02x:" % bsses[j].dot11Bssid[k]
+                    
+                    network.bssid = ':'.join([ "%02x" % i for i in bsses[j].dot11Bssid])
 
                     network.signal = bsses[j].lRssi
                     network.freq = bsses[j].ulChCenterFrequency
@@ -326,7 +325,7 @@ class WifiUtil():
 
         self._wlan_disconnect(self._handle, obj['guid'])
 
-    def add_network_profile(self, obj, params):
+    def add_network_profile(self, obj: Dict[str, str], params: Profile):
         """Add an AP profile for connecting to afterward."""
 
         reason_code = DWORD()
@@ -396,7 +395,7 @@ class WifiUtil():
         
         return params
 
-    def network_profile_name_list(self, obj):
+    def network_profile_name_list(self, obj) -> List[str]:
         """Get AP profile names."""
 
         profile_list = pointer(WLAN_PROFILE_INFO_LIST())
@@ -415,7 +414,7 @@ class WifiUtil():
 
         return profile_name_list
 
-    def network_profiles(self, obj):
+    def network_profiles(self, obj) -> List[Profile]:
         """Get AP profiles."""
 
         profile_name_list = self.network_profile_name_list(obj)
@@ -449,7 +448,7 @@ class WifiUtil():
 
         return profile_list
 
-    def remove_network_profile(self, obj, params):
+    def remove_network_profile(self, obj: Dict[str, str], params: Profile):
         """Remove the specified AP profile."""
 
         self._logger.debug("delete profile: %s", params.ssid)
@@ -480,7 +479,7 @@ class WifiUtil():
 
         return status_dict[data.contents.value]
 
-    def interfaces(self):
+    def interfaces(self) -> List[Dict[str, str]]:
         """Get the wifi interface lists."""
 
         ifaces = []
@@ -500,7 +499,7 @@ class WifiUtil():
         for i in range(0, self._ifaces.contents.dwNumberOfItems):
             iface = {}
             iface['guid'] = interfaces[i].InterfaceGuid
-            iface['name'] = interfaces[i].strInterfaceDescription
+            iface['name']= interfaces[i].strInterfaceDescription
             ifaces.append(iface)
 
         return ifaces

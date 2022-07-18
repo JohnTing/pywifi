@@ -21,6 +21,11 @@ from pywifi import const
 
 pywifi.set_loglevel(logging.INFO)
 
+WINDOWS_IFACE = "Intel(R) Dual Band Wireless-AC 7260"
+TEST_SSID = "testap"
+TEST_SSID_2 = "testap2"
+TEST_SSID_3 = "testap3"
+TEST_PW = "12345678"
 
 class SockMock:
 
@@ -189,8 +194,7 @@ def test_interfaces():
     assert wifi.interfaces()
 
     if platform.system().lower() == 'windows':
-        assert wifi.interfaces()[0].name() ==\
-            'Intel(R) Dual Band Wireless-AC 7260'
+        assert wifi.interfaces()[0].name() == WINDOWS_IFACE
     elif platform.system().lower() == 'linux':
         assert wifi.interfaces()[0].name() == 'wlx000c433243ce'
 
@@ -208,27 +212,27 @@ def test_scan():
 def test_profile_comparison():
 
     profile1 = pywifi.Profile()
-    profile1.ssid = 'testap'
+    profile1.ssid = TEST_SSID
     profile1.auth = const.AUTH_ALG_OPEN
     profile1.akm.append(const.AKM_TYPE_WPA2PSK)
     profile1.cipher = const.CIPHER_TYPE_CCMP
-    profile1.key = '12345678'
+    profile1.key = TEST_PW
 
     profile2 = pywifi.Profile()
-    profile2.ssid = 'testap'
+    profile2.ssid = TEST_SSID
     profile2.auth = const.AUTH_ALG_OPEN
     profile2.akm.append(const.AKM_TYPE_WPA2PSK)
     profile2.cipher = const.CIPHER_TYPE_CCMP
-    profile2.key = '12345678'
+    profile2.key = TEST_PW
 
     assert profile1 == profile2
 
     profile3 = pywifi.Profile()
-    profile3.ssid = 'testap'
+    profile3.ssid = TEST_SSID
     profile3.auth = const.AUTH_ALG_OPEN
     profile3.akm.append(const.AKM_TYPE_WPAPSK)
     profile3.cipher = const.CIPHER_TYPE_CCMP
-    profile3.key = '12345678'
+    profile3.key = TEST_PW
 
     assert profile1 == profile3
 
@@ -240,11 +244,11 @@ def test_add_network_profile():
     iface = wifi.interfaces()[0]
 
     profile = pywifi.Profile()
-    profile.ssid = 'testap'
+    profile.ssid = TEST_SSID
     profile.auth = const.AUTH_ALG_OPEN
     profile.akm.append(const.AKM_TYPE_WPA2PSK)
     profile.cipher = const.CIPHER_TYPE_CCMP
-    profile.key = '12345678'
+    profile.key = TEST_PW
 
     iface.remove_all_network_profiles()
 
@@ -254,7 +258,7 @@ def test_add_network_profile():
     profiles = iface.network_profiles()
 
     assert profiles is not None
-    assert profiles[0].ssid == "testap"
+    assert profiles[0].ssid == TEST_SSID
     assert const.AKM_TYPE_WPA2PSK in profiles[0].akm
     assert const.AUTH_ALG_OPEN == profiles[0].auth
 
@@ -269,27 +273,27 @@ def test_remove_network_profile():
     assert len(iface.network_profiles()) == 0
 
     profile1 = pywifi.Profile()
-    profile1.ssid = 'testap'
+    profile1.ssid = TEST_SSID
     profile1.auth = const.AUTH_ALG_OPEN
     profile1.akm.append(const.AKM_TYPE_WPA2PSK)
     profile1.cipher = const.CIPHER_TYPE_CCMP
-    profile1.key = '12345678'
+    profile1.key = TEST_PW
     iface.add_network_profile(profile1)
 
     profile2 = pywifi.Profile()
-    profile2.ssid = 'testap2'
+    profile2.ssid = TEST_SSID_2
     profile2.auth = const.AUTH_ALG_OPEN
     profile2.akm.append(const.AKM_TYPE_WPA2PSK)
     profile2.cipher = const.CIPHER_TYPE_CCMP
-    profile2.key = '12345678'
+    profile2.key = TEST_PW
     iface.add_network_profile(profile2)
 
     profile3 = pywifi.Profile()
-    profile3.ssid = 'testap3'
+    profile3.ssid = TEST_SSID_3
     profile3.auth = const.AUTH_ALG_OPEN
     profile3.akm.append(const.AKM_TYPE_WPAPSK)
     profile3.cipher = const.CIPHER_TYPE_TKIP
-    profile3.key = '12345678'
+    profile3.key = TEST_PW
     iface.add_network_profile(profile3)
 
     profiles = iface.network_profiles()
@@ -326,11 +330,11 @@ def test_connect():
         [const.IFACE_DISCONNECTED, const.IFACE_INACTIVE]
 
     profile = pywifi.Profile()
-    profile.ssid = 'testap'
+    profile.ssid = TEST_SSID
     profile.auth = const.AUTH_ALG_OPEN
     profile.akm.append(const.AKM_TYPE_WPA2PSK)
     profile.cipher = const.CIPHER_TYPE_CCMP
-    profile.key = '12345678'
+    profile.key = TEST_PW
 
     iface.remove_all_network_profiles()
     tmp_profile = iface.add_network_profile(profile)
@@ -357,7 +361,7 @@ def test_connect_open():
         [const.IFACE_DISCONNECTED, const.IFACE_INACTIVE]
 
     profile = pywifi.Profile()
-    profile.ssid = 'testap'
+    profile.ssid = TEST_SSID
     profile.auth = const.AUTH_ALG_OPEN
     profile.akm.append(const.AKM_TYPE_NONE)
 
